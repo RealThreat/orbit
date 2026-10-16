@@ -1,6 +1,46 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { createHash } from "node:crypto";
 import { createOrbitHandler } from "../supabase/functions/orbit-api/handler.mjs";
+test("health accepts the shortened path forwarded by the hosted Edge gateway", async () => {
+  const handler = createOrbitHandler({
+    url: "https://orbit.supabase.co",
+    publicKey: "anon-test",
+    fetcher: async () => {
+      throw new Error("Health must not fetch user data");
+    },
+  });
+  for (const prefix of ["/orbit-api", "/functions/v1/orbit-api"]) {
+    const result = await handler(
+      new Request(`https://orbit.supabase.co${prefix}/health`)
+    );
+    assert.equal(result.status, 200);
+    assert.equal((await result.json()).service, "orbit");
+  }
+});
+
+test("email return page stays on Orbit and clears fragments without external scripts", async () => {
+  const handler = createOrbitHandler({
+    url: "https://orbit.supabase.co",
+    publicKey: "anon-test",
+    fetcher: async () => {
+      throw new Error("No network expected");
+    },
+  });
+  const response = await handler(
+    new Request("https://orbit.supabase.co/orbit-api/auth-complete")
+  );
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  const script = /<script>(.*?)<\/script>/.exec(html)[1];
+  const hash = createHash("sha256").update(script).digest("base64");
+  assert.ok(
+    response.headers.get("Content-Security-Policy").includes(`'sha256-${hash}'`)
+  );
+  assert.ok(script.includes("history.replaceState"));
+  assert.equal(response.headers.get("Referrer-Policy"), "no-referrer");
+  assert.ok(!html.includes("src="));
+});
 const user = {
   id: "11111111-1111-4111-8111-111111111111",
   email: "alex@example.test",
@@ -55,6 +95,25 @@ test("no private database access without verified authentication", async () => {
     401
   );
   assert.equal(f.calls.length, 0);
+});
+
+test("an Auth 403 is normalized to an expired session without touching the database", async () => {
+  let calls = 0;
+  const handler = createOrbitHandler({
+    url: "https://orbit.supabase.co",
+    publicKey: "anon-test",
+    fetcher: async () => {
+      calls++;
+      return Response.json({ message: "invalid token" }, { status: 403 });
+    },
+  });
+  const response = await handler(
+    new Request("https://orbit.supabase.co/orbit-api/profile/me", {
+      headers: { Authorization: "Bearer invalid" },
+    })
+  );
+  assert.equal(response.status, 401);
+  assert.equal(calls, 1);
 });
 test("profile is projected for Orbit and never returns a credential or subscription grant", async () => {
   const f = fixture();

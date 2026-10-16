@@ -131,3 +131,72 @@ test("invalid recovery inputs never reach the service and token fields are valid
     /auth/
   );
 });
+
+test("default email links are verified only with Orbit and never followed to their redirect", async (t) => {
+  const { state, service } = await fixture(t);
+  state.reply = {
+    access_token: "verified-access",
+    refresh_token: "verified-refresh",
+    expires_in: 3600,
+    user: { email: "alex@example.test" },
+  };
+  const result = await service.performOrbitAccount({
+    action: "verify",
+    email: "alex@example.test",
+    code:
+      "https://orbit-test.supabase.co/auth/v1/verify?token=" +
+      "a".repeat(64) +
+      "&type=signup&redirect_to=https://evil.test",
+  });
+  assert.equal(result.session?.accessToken, "verified-access");
+  assert.equal(state.requests.length, 1);
+  assert.equal(
+    state.requests[0].url,
+    "https://orbit-test.supabase.co/auth/v1/verify"
+  );
+  assert.deepEqual(state.requests[0].data, {
+    type: "signup",
+    token_hash: "a".repeat(64),
+  });
+});
+test("foreign verification links and links for another email cannot change a password", async (t) => {
+  const { state, service } = await fixture(t);
+  for (const code of [
+    "https://evil.test/auth/v1/verify?token=" +
+      "a".repeat(64) +
+      "&type=recovery",
+    "https://orbit-test.supabase.co/auth/v1/verify?token=" +
+      "a".repeat(64) +
+      "&type=signup",
+  ])
+    await assert.rejects(
+      service.performOrbitAccount({
+        action: "recover-verify",
+        email: "alex@example.test",
+        password: "new-password-123",
+        code,
+      }),
+      /invalid-input/
+    );
+  assert.equal(state.requests.length, 0);
+  state.reply = {
+    access_token: "access",
+    refresh_token: "refresh",
+    expires_in: 3600,
+    user: { email: "someone-else@example.test" },
+  };
+  await assert.rejects(
+    service.performOrbitAccount({
+      action: "recover-verify",
+      email: "alex@example.test",
+      password: "new-password-123",
+      code:
+        "https://orbit-test.supabase.co/auth/v1/verify?token=" +
+        "a".repeat(64) +
+        "&type=recovery",
+    }),
+    /auth/
+  );
+  assert.equal(state.requests.length, 1);
+  assert.ok(!state.requests.some((request) => request.method === "PUT"));
+});

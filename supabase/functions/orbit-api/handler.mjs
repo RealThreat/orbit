@@ -39,8 +39,25 @@ export function createOrbitHandler({ url, publicKey, fetcher = fetch }) {
     try {
       const incoming = new URL(request.url);
       const path =
-        incoming.pathname.replace(/^\/functions\/v1\/orbit-api/, "") || "/";
+        incoming.pathname.replace(
+          /^\/(?:functions\/v1\/)?orbit-api(?=\/|$)/,
+          ""
+        ) || "/";
       const method = request.method;
+      if (method === "GET" && path === "/auth-complete") {
+        return new Response(
+          `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="referrer" content="no-referrer"><title>Orbit — retour à l’application</title></head><body><h1>Retourne dans Orbit</h1><p>Si tu viens de confirmer ton adresse e-mail, tu peux maintenant te connecter dans Orbit.</p><p>Pour récupérer ton compte, copie le lien reçu par e-mail dans le formulaire de récupération d’Orbit, sans ouvrir ce lien. Si tu l’as déjà utilisé, demande un nouveau lien.</p><script>history.replaceState(null, '', location.pathname);</script></body></html>`,
+          {
+            headers: {
+              "Content-Type": "text/html; charset=utf-8",
+              "Cache-Control": "no-store",
+              "Referrer-Policy": "no-referrer",
+              "Content-Security-Policy":
+                "default-src 'none'; script-src 'sha256-BSHIA8uyEksveTZNsWDdE7q9p6Oqa/LdAOuySBi6RJg='; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+            },
+          }
+        );
+      }
       if (method === "GET" && path === "/health")
         return json({
           service: "orbit",
@@ -71,7 +88,16 @@ export function createOrbitHandler({ url, publicKey, fetcher = fetch }) {
         return result.status === 204 ? null : result.json();
       };
       // Verify server-side; decoding a JWT is not authentication.
-      const user = await call("/auth/v1/user");
+      let user;
+      try {
+        user = await call("/auth/v1/user");
+      } catch (error) {
+        // GoTrue may use 403 for an invalid bearer; the launcher expects 401
+        // for invalid sessions. Database authorization failures stay 403.
+        if ([401, 403].includes(error.status))
+          return json({ message: "Orbit sign-in required" }, 401);
+        throw error;
+      }
       if (typeof user.id !== "string" || !/^[0-9a-f-]{36}$/i.test(user.id))
         return json({ message: "Invalid Orbit session" }, 401);
       const body = async () => {

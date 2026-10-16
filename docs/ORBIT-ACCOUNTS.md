@@ -1,5 +1,7 @@
 # Comptes Orbit : configuration et limites
 
+Le premier déploiement est maintenant installé : voir [l’état vérifié](ORBIT-DEPLOYMENT.md). Les étapes ci-dessous décrivent aussi la reproduction sur un nouveau projet.
+
 ## Hébergement gratuit retenu
 
 Le socle utilise un projet **Supabase appartenant au mainteneur d'Orbit** : Auth pour les comptes, PostgreSQL pour les profils/bibliothèques et une Edge Function pour l'API de compatibilité. Aucun serveur Render ni domaine acheté n'est nécessaire pour commencer. Le domaine technique du projet suffit.
@@ -20,7 +22,7 @@ Sources officielles vérifiées le 16 octobre 2026 :
 1. Créer un projet gratuit « Orbit » depuis https://supabase.com/dashboard, dans sa propre organisation. Choisir une région proche des utilisateurs. Le mot de passe de base de données reste privé.
 2. Dans SQL Editor, exécuter `supabase/migrations/202610160001_orbit_accounts.sql`. Cette migration crée les tables Orbit, les règles d'accès par utilisateur et le déclencheur de profil. Ne pas utiliser une base qui héberge déjà un autre produit sans relire la migration.
 3. Déployer la fonction du dépôt, depuis sa racine : `npx supabase login`, puis `npx supabase functions deploy orbit-api --project-ref <identifiant-du-projet>`. La fonction vérifie le bearer auprès d'Auth avant chaque accès à la base. Les requêtes de base réutilisent le JWT utilisateur et restent soumises à RLS ; la clé service-role n'est pas utilisée.
-4. Activer l'authentification e-mail/mot de passe et la confirmation d'adresse. Régler le minimum de mot de passe à 12 caractères. Dans les modèles « Confirm signup » et « Reset password », inclure `{{ .Token }}` : l'application demande le code numérique, pas un retour vers Hydra ni un lien contenant une session. Conserver les liens de confirmation appropriés dans le modèle de changement d'adresse e-mail.
+4. Activer l'authentification e-mail/mot de passe et la confirmation d'adresse. Régler le minimum de mot de passe à 12 caractères. Avec un SMTP personnalisé, les modèles « Confirm signup » et « Reset password » peuvent inclure `{{ .Token }}`. Avec le fournisseur gratuit par défaut, conserver ses modèles et utiliser le lien standard : Orbit accepte désormais le code ou le lien de vérification propre au projet. Conserver les liens de confirmation appropriés dans le modèle de changement d'adresse e-mail.
 5. Configurer le SMTP pour tester avec des destinataires hors de l'équipe. Conserver les protections contre l'abus et les limites d'envoi. Le CAPTCHA n'est pas encore intégré au formulaire natif ; ne pas activer un CAPTCHA obligatoire sans ajouter cette prise en charge.
 6. Copier uniquement l'URL du projet et sa clé **publishable** publique (ou l'ancienne clé **anon**) dans un fichier `.env` local non commité :
 
@@ -48,7 +50,7 @@ Les sessions Orbit sont chiffrées avec Electron safeStorage, dans une clé dist
 
 | Fonction                                                                                             | Couverture                                                                                                                |
 | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Inscription/connexion, confirmation par code, récupération, changement de mot de passe/adresse       | Client natif + Supabase Auth, à configurer/tester réellement                                                              |
+| Inscription/connexion, confirmation par code, récupération, changement de mot de passe/adresse       | Client natif + Supabase Auth, déployés ; parcours e-mail réel à tester                                                    |
 | Profil personnel                                                                                     | Lecture, pseudo, bio, visibilité                                                                                          |
 | Bibliothèque                                                                                         | Création et envoi de lots, récupération paginée, favoris, épingles, temps manuel/incrémental et retrait distant explicite |
 | Sessions                                                                                             | Stockage chiffré, renouvellement et rotation du refresh token, séparation par projet                                      |
@@ -59,6 +61,6 @@ Les sessions Orbit sont chiffrées avec Electron safeStorage, dans une clé dist
 
 Une route non implémentée retourne explicitement `501 orbit-service-pending`, jamais des résultats factices ou un repli authentifié sur Hydra. Les fonctions non migrées ne sont donc pas opérationnelles avec les comptes Orbit à ce stade. Le code et les écrans sont conservés, mais ce socle ne doit pas être publié comme une migration complète de toutes les fonctionnalités.
 
-Validation locale : tests de politique, vrais intercepteurs HTTP avec transport simulé, protections de contexte/concurrence, rotation des refresh tokens, stockage chiffré avec frontière Electron simulée et tests du handler serveur avec transport simulé. Formulaire réel inspecté dans un navigateur isolé (état non configuré et inscription vers confirmation). Aucune vraie inscription, aucun envoi d'e-mail, aucun déploiement Supabase, aucune migration sur un projet Supabase hébergé et aucun installateur natif n'ont été exécutés.
+Validation locale : tests de politique, vrais intercepteurs HTTP avec transport simulé, protections de contexte/concurrence, rotation des refresh tokens, stockage chiffré avec frontière Electron simulée et tests du handler serveur avec transport simulé. Formulaire réel inspecté dans un navigateur isolé (état non configuré et inscription vers confirmation). Le déploiement et la migration hébergés ont ensuite été exécutés et vérifiés (voir ORBIT-DEPLOYMENT.md). Les vraies inscriptions, envois d’e-mails, sessions Electron complètes et installateurs restent à tester.
 
 Le contrôle optionnel `scripts/check-orbit-rls.mjs` a exécuté la migration SQL réelle dans PostgreSQL/WASM (PGlite), avec création de profil, fusion atomique, incrément de temps, refus des accès anonymes et refus des lectures/écritures/suppressions croisées entre deux utilisateurs simulés. Cela ne remplace pas les tests de JWT et RLS sur le projet Supabase hébergé. Pour reproduire : `npm install --prefix .cache/orbit-db-check --no-package-lock --ignore-scripts @electric-sql/pglite`, puis `node scripts/check-orbit-rls.mjs`. Cette dépendance de contrôle n’est pas embarquée dans Orbit.

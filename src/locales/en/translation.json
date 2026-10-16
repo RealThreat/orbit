@@ -2684,18 +2684,18 @@
     "not_configured": "Orbit accounts are not configured in this build yet. Your local library remains available.",
     "email": "Email address",
     "display_name": "Display name",
-    "code": "Code received by email",
+    "code": "Email code or verification link",
     "password": "Password",
     "password_hint": "At least 12 characters.",
     "busy": "Please wait…",
     "forgot": "Forgot password",
-    "check-email": "Check your email. To confirm sign-up or recover your account, enter the code below. For an email change, confirm the messages you receive.",
+    "check-email": "Check your email. Confirm your email using the link and then sign in, or paste the link/code below. To recover your account, copy the recovery link without opening it and paste it here with your new password. For an email change, confirm the messages you receive.",
     "updated": "Your account was updated.",
     "actions": {
       "sign-in": "Sign in",
       "sign-up": "Create my Orbit account",
       "verify": "Confirm my email",
-      "recover": "Send a recovery code",
+      "recover": "Send a recovery email",
       "recover-verify": "Set my new password",
       "update-password": "Change my password",
       "update-email": "Change my email"
@@ -2707,6 +2707,7 @@
       "network": "Orbit is unreachable. Try again later.",
       "secure-storage": "Secure session storage is unavailable on this computer."
     },
-    "service_scope": "Accounts and library are being set up. Friends, messages and cloud saves still need their Orbit service."
+    "service_scope": "Your account and library data use Orbit. Friends, messages and cloud saves are still being prepared.",
+    "verification_hint": "To use a link, copy it from the email without opening it, then paste it here."
   }
 }

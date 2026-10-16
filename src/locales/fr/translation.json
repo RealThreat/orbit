@@ -2409,18 +2409,18 @@
     "not_configured": "Les comptes Orbit ne sont pas encore configurés dans cette version. La bibliothèque locale reste disponible.",
     "email": "Adresse e-mail",
     "display_name": "Pseudo",
-    "code": "Code reçu par e-mail",
+    "code": "Code ou lien reçu par e-mail",
     "password": "Mot de passe",
     "password_hint": "12 caractères minimum.",
     "busy": "Patiente…",
     "forgot": "Mot de passe oublié",
-    "check-email": "Consulte tes e-mails. Pour confirmer une inscription ou récupérer ton compte, saisis le code reçu ci-dessous. Pour un changement d’adresse, confirme les messages reçus.",
+    "check-email": "Consulte tes e-mails. Confirme ton adresse avec le lien reçu puis reviens te connecter, ou colle le lien/code ci-dessous. Pour récupérer ton compte, copie le lien de récupération sans l’ouvrir et colle-le ici avec ton nouveau mot de passe. Si tu changes d’adresse, confirme les e-mails reçus.",
     "updated": "Ton compte a été mis à jour.",
     "actions": {
       "sign-in": "Se connecter",
       "sign-up": "Créer mon compte Orbit",
       "verify": "Confirmer mon adresse",
-      "recover": "Recevoir un code de récupération",
+      "recover": "Recevoir un e-mail de récupération",
       "recover-verify": "Définir mon nouveau mot de passe",
       "update-password": "Changer mon mot de passe",
       "update-email": "Changer mon adresse e-mail"
@@ -2432,6 +2432,7 @@
       "network": "Le service Orbit est inaccessible. Réessaie plus tard.",
       "secure-storage": "Le stockage sécurisé de la session est indisponible sur cet ordinateur."
     },
-    "service_scope": "Les comptes et la bibliothèque sont en cours de mise en place. Les amis, messages et sauvegardes cloud attendent encore leur service Orbit."
+    "service_scope": "Ton compte et les données de ta bibliothèque utilisent Orbit. Les amis, messages et sauvegardes cloud sont encore en préparation.",
+    "verification_hint": "Pour utiliser un lien, copie-le depuis l’e-mail sans l’ouvrir, puis colle-le ici."
   }
 }

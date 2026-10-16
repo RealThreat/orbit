@@ -135,17 +135,47 @@ export async function performOrbitAccount(input: OrbitAccountInput) {
   }
   if (input.action === "verify" || input.action === "recover-verify") {
     checkEmail();
-    if (typeof input.code !== "string" || !/^\d{6,10}$/.test(input.code))
+    if (typeof input.code !== "string" || input.code.length > 2048)
       throw new Error("invalid-input");
+    const type = input.action === "verify" ? "signup" : "recovery";
+    let verification: {
+      type: string;
+      email?: string;
+      token?: string;
+      token_hash?: string;
+    };
+    if (/^\d{6,10}$/.test(input.code.trim())) {
+      verification = { type, email, token: input.code.trim() };
+    } else {
+      let link: URL;
+      try {
+        link = new URL(input.code.trim());
+      } catch {
+        throw new Error("invalid-input");
+      }
+      const tokenHash = link.searchParams.get("token");
+      if (
+        link.origin !== getOrbitConfig()?.url ||
+        link.pathname !== "/auth/v1/verify" ||
+        link.username ||
+        link.password ||
+        link.searchParams.get("type") !== type ||
+        !tokenHash ||
+        !/^[a-zA-Z0-9_-]{20,512}$/.test(tokenHash)
+      )
+        throw new Error("invalid-input");
+      // Verify only at this project's Auth API. Never follow the email URL or its redirect_to.
+      verification = { type, token_hash: tokenHash };
+    }
     if (input.action === "recover-verify") checkPassword();
     encryption();
-    const session = orbitSession(
-      await orbitAuthRequest("/verify", {
-        email,
-        token: input.code,
-        type: input.action === "verify" ? "signup" : "recovery",
-      })
-    );
+    const verified = await orbitAuthRequest("/verify", verification);
+    if (
+      verification.token_hash &&
+      verified.user?.email?.toLowerCase() !== email.toLowerCase()
+    )
+      throw new Error("auth");
+    const session = orbitSession(verified);
     if (input.action === "recover-verify")
       await orbitAuthRequest("/user", { password }, session.accessToken, "PUT");
     return { session };

@@ -1,5 +1,20 @@
 project_id = "orbit-launcher"
 
+[auth]
+minimum_password_length = 12
+
+[auth.email]
+enable_confirmations = true
+
+# Supabase's default free email provider rejects custom templates.
+# After configuring custom SMTP, enable the following optional code-based emails:
+# [auth.email.template.confirmation]
+# subject = "Orbit — confirme ton adresse e-mail"
+# content_path = "./supabase/templates/confirmation.html"
+# [auth.email.template.recovery]
+# subject = "Orbit — récupère ton compte"
+# content_path = "./supabase/templates/recovery.html"
+
 [functions.orbit-api]
 # The handler validates the bearer with Auth /user before accessing RLS-scoped data.
 # This supports both publishable keys and the newer JWT signing keys.

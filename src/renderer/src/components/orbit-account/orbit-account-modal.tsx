@@ -131,11 +131,11 @@ export function OrbitAccountModal() {
           <TextField
             label={t("code")}
             autoComplete="one-time-code"
-            inputMode="numeric"
             value={code}
             onChange={(e) => setCode(e.target.value)}
             required
-            pattern="[0-9]{6,10}"
+            maxLength={2048}
+            hint={t("verification_hint")}
             disabled={busy}
           />
         )}
