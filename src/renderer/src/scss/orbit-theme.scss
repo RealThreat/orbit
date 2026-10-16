@@ -1,0 +1,614 @@
+// Orbit's desktop visual language. Keep component layouts and state modifiers intact.
+// The body scope wins over component defaults while user-injected themes can override it.
+body {
+  .download-group__simple-card {
+    padding: 14px;
+    background: #181a1d;
+    border: 1px solid #ffffff12;
+    border-radius: 12px;
+  }
+  .download-group__simple-thumbnail {
+    border-radius: 8px;
+  }
+  .download-group__stat-value {
+    font-family: "Space Grotesk", sans-serif;
+  }
+  .achievements__list {
+    background: #101113;
+    padding: 24px;
+    gap: 8px;
+  }
+  .achievements__item {
+    padding: 16px;
+    border-radius: 10px;
+    background: #181a1d;
+    border: 1px solid #ffffff08;
+  }
+  .achievements__item:hover {
+    background: #202226;
+  }
+  .achievements__table-header {
+    background: #151719;
+    border-color: #ffffff12;
+  }
+  --orbit-canvas: #101113;
+  --orbit-surface: #181a1d;
+  --orbit-raised: #202226;
+  --orbit-line: #ffffff12;
+  --orbit-text: #f1f0eb;
+  --orbit-muted: #999c9f;
+  --orbit-accent: #d2ee89;
+  color: var(--orbit-text);
+  -webkit-font-smoothing: antialiased;
+
+  h1,
+  h2,
+  h3 {
+    font-family: "Space Grotesk", "Noto Sans", sans-serif;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font-family: inherit;
+  }
+  button:focus-visible,
+  a:focus-visible,
+  summary:focus-visible {
+    outline: 2px solid var(--orbit-accent);
+    outline-offset: 3px;
+  }
+  .container__content {
+    background: var(--orbit-canvas);
+  }
+  .title-bar {
+    background: #101113;
+    color: #999c9f;
+    border-color: var(--orbit-line);
+  }
+  .header {
+    background: var(--orbit-canvas);
+    padding: 18px 28px;
+    border-color: var(--orbit-line);
+  }
+  .header__title {
+    font-size: 17px;
+    letter-spacing: -0.4px;
+    font-weight: 600;
+  }
+  .header__search {
+    background: var(--orbit-surface);
+    border-color: var(--orbit-line);
+    border-radius: 10px;
+  }
+  .header__search:focus-within {
+    border-color: #d2ee8970;
+  }
+  .sidebar {
+    background: #121315;
+    border-color: var(--orbit-line);
+  }
+  .sidebar__orbit-brand {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 25px;
+    letter-spacing: -1px;
+    padding: 20px 24px 28px;
+  }
+  .sidebar__orbit-brand span {
+    width: 36px;
+    height: 36px;
+    background: #202322;
+    border: 1px solid #d2ee8920;
+    border-radius: 10px;
+  }
+  .sidebar__content {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .sidebar__menu-item {
+    color: #a5a8aa;
+    border-radius: 8px;
+  }
+  .sidebar__menu-item:hover {
+    background: #ffffff06;
+    color: var(--orbit-text);
+  }
+  .sidebar__menu-item--active {
+    background: #d2ee8910;
+    color: var(--orbit-accent);
+    box-shadow: inset 2px 0 var(--orbit-accent);
+  }
+  .sidebar__menu-button {
+    padding: 11px 12px;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .sidebar-profile__button {
+    border-radius: 10px;
+    background: #ffffff04;
+    border: 1px solid var(--orbit-line);
+  }
+  .bottom-panel {
+    background: #121315;
+    border-color: var(--orbit-line);
+    color: var(--orbit-muted);
+  }
+
+  .button {
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    min-height: 40px;
+    transition:
+      background-color 0.16s,
+      border-color 0.16s,
+      color 0.16s;
+  }
+  .button--primary {
+    background: var(--orbit-accent);
+    color: #202619;
+  }
+  .button--primary:hover:not(:disabled) {
+    background: #e2f7b2;
+  }
+  .button--outline {
+    background: #ffffff03;
+    border-color: #ffffff18;
+  }
+  .button--outline:hover:not(:disabled) {
+    background: #ffffff08;
+    border-color: #ffffff30;
+  }
+  .button--dark {
+    background: var(--orbit-raised);
+  }
+  .button--small {
+    min-height: 28px;
+    font-size: 12px;
+  }
+  .text-field-container__text-field,
+  .select-field {
+    background: #141618;
+    border-color: #ffffff18;
+    border-radius: 9px;
+  }
+  .text-field-container__text-field:hover,
+  .select-field:hover {
+    border-color: #ffffff30;
+  }
+  .text-field-container__text-field--focused,
+  .select-field--focused {
+    border-color: #d2ee8970;
+    box-shadow: 0 0 0 3px #d2ee8909;
+  }
+  .text-field-container__text-field--has-error {
+    border-color: #e11d48;
+  }
+  .text-field-container__text-field-input {
+    padding: 10px 12px;
+    color: var(--orbit-text);
+  }
+  .select-field__option {
+    background: #141618;
+    padding-left: 12px;
+    color: var(--orbit-text);
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: #7f8488;
+  }
+  .modal {
+    background: #1b1d20;
+    border-color: #ffffff18;
+    border-radius: 16px;
+    box-shadow: 0 28px 90px #0008;
+    min-width: min(400px, calc(100vw - 32px));
+    max-width: calc(100vw - 32px);
+  }
+  .modal--large {
+    max-width: min(800px, calc(100vw - 32px));
+  }
+  .modal__header {
+    padding: 22px 24px;
+  }
+  .modal__header h3 {
+    font-size: 20px;
+    letter-spacing: -0.5px;
+  }
+  .modal__content:not(.modal__content--no-padding) {
+    padding: 24px;
+  }
+
+  .home__content,
+  .console-achievements {
+    background: var(--orbit-canvas);
+    padding: 32px clamp(20px, 3vw, 48px) 40px;
+    gap: 28px;
+  }
+  .home__welcome h1 {
+    font-size: clamp(24px, 2.3vw, 34px);
+    font-weight: 500;
+    letter-spacing: -1.2px;
+  }
+  .home__date {
+    color: var(--orbit-muted);
+    font-size: 12px;
+  }
+  .home__search {
+    background: var(--orbit-surface);
+    border-color: var(--orbit-line);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .home__top-grid {
+    grid-template-columns: minmax(0, 2.5fr) minmax(220px, 1fr);
+    gap: 18px;
+  }
+  .home__spotlight {
+    min-height: 330px;
+    border-radius: 16px;
+    background: #242d29;
+    border: 1px solid #ffffff0c;
+  }
+  .home__spotlight::before {
+    width: 75%;
+    height: 160%;
+    border-radius: 24%;
+    background: linear-gradient(135deg, #6b84632b, #a6b68215);
+    transform: rotate(-28deg);
+    right: -20%;
+    top: -35%;
+  }
+  .home__spotlight::after {
+    width: 36%;
+    height: 140%;
+    border: 1px solid #d2ee8915;
+    background: transparent;
+    border-radius: 24%;
+    transform: rotate(-28deg);
+    right: 2%;
+    bottom: -55%;
+  }
+  .home__hero-art {
+    mask-image: linear-gradient(90deg, transparent, #000 85%);
+    opacity: 0.8;
+  }
+  .home__spotlight-content {
+    padding: 30px;
+    background: linear-gradient(90deg, #17201def, #17201d90 55%, transparent);
+  }
+  .home__spotlight h2 {
+    font-size: clamp(30px, 3.5vw, 50px);
+    font-weight: 500;
+    letter-spacing: -2px;
+    margin: 16px 0 22px;
+  }
+  .home__pill {
+    background: #d2ee891c;
+    color: #d2ee89;
+    border: 1px solid #d2ee8925;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-radius: 5px;
+  }
+  .home__game-stats strong {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 23px;
+    font-weight: 500;
+  }
+  .home__game-stats span,
+  .home__spotlight p {
+    color: #b0bbb3;
+  }
+  .home__primary,
+  .home__secondary {
+    padding: 13px 20px;
+    border-radius: 9px;
+  }
+  .home__primary {
+    background: var(--orbit-accent);
+  }
+  .home__secondary {
+    background: #ffffff05;
+    border-color: #ffffff25;
+  }
+  .home__panel {
+    background: var(--orbit-surface);
+    border-color: var(--orbit-line);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .home__big-number {
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 46px;
+    font-weight: 500;
+  }
+  .home__activity-orbit {
+    color: #d2ee8950;
+  }
+  .home__detail {
+    border-top: 1px solid var(--orbit-line);
+    margin-top: 12px;
+  }
+  .home__section-heading h2 {
+    font-size: 20px;
+    font-weight: 500;
+  }
+  .home__section-heading button {
+    color: #b8c7a1;
+  }
+  .home__cover {
+    border-radius: 10px;
+    background: linear-gradient(145deg, #32453e, #1b2327);
+    border: 1px solid var(--orbit-line);
+  }
+  .home__cover::before {
+    border-radius: 0;
+    transform: rotate(-30deg);
+    background: #ffffff04;
+  }
+  .home__cover--1 {
+    background: linear-gradient(145deg, #544a34, #28251f);
+  }
+  .home__cover--2 {
+    background: linear-gradient(145deg, #553740, #2c222a);
+  }
+  .home__cover--3 {
+    background: linear-gradient(145deg, #34534a, #1e2b28);
+  }
+  .home__cover--4 {
+    background: linear-gradient(145deg, #44425c, #242331);
+  }
+  .home__source {
+    border-radius: 5px;
+    font-size: 10px;
+    background: #101113c0;
+  }
+  .home__cover-progress {
+    height: 3px;
+    background: var(--orbit-accent);
+  }
+  .home__trophy {
+    border-radius: 9px;
+    background: #d2ee890a;
+    color: var(--orbit-accent);
+    padding: 12px;
+  }
+  .home__achievement {
+    padding: 14px 0;
+  }
+  .home__achievement progress {
+    height: 4px;
+  }
+  .home__library-stats strong {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 500;
+  }
+  .home__source-bar {
+    height: 7px;
+  }
+
+  .library__content {
+    padding: 24px 24px 0;
+    gap: 20px;
+  }
+  .library__page-title {
+    font-size: 28px;
+    font-weight: 500;
+    letter-spacing: -1px;
+  }
+  .library__page-header {
+    padding-right: 0;
+  }
+  .library__games-grid {
+    gap: 20px;
+  }
+  .library__quick-action {
+    border: 1px solid var(--orbit-line);
+    border-radius: 8px;
+    background: var(--orbit-surface);
+  }
+  .library__count {
+    background: #ffffff04;
+    border: 1px solid var(--orbit-line);
+  }
+  .library-game-card__wrapper {
+    border-radius: 10px;
+    box-shadow: 0 4px 16px #0002;
+  }
+  .library-game-card__wrapper:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px #0004;
+  }
+  .game-card,
+  .vertical-cover-card {
+    border-radius: 10px;
+  }
+  .settings__container {
+    padding: 24px;
+  }
+  .settings__content {
+    background: var(--orbit-canvas);
+    border-radius: 14px;
+    box-shadow: none;
+    border-color: var(--orbit-line);
+  }
+  .settings__sidebar {
+    background: #151719;
+    min-width: 205px;
+    padding: 20px 12px;
+    gap: 5px;
+  }
+  .settings__sidebar-button {
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 13px;
+    color: #a4a8ab;
+  }
+  .settings__sidebar-button:hover {
+    background: #ffffff05;
+  }
+  .settings__sidebar-button--active {
+    background: #d2ee8910;
+    color: var(--orbit-accent);
+  }
+  .settings__panel {
+    padding: 28px;
+    gap: 24px;
+  }
+  .settings-integration-card {
+    background: var(--orbit-surface);
+    border-color: var(--orbit-line);
+    border-radius: 12px;
+    box-shadow: none;
+  }
+  .game-details__description-container {
+    background: var(--orbit-canvas);
+    padding: 24px;
+    gap: 24px;
+  }
+  .console-achievements h1 {
+    font-weight: 500;
+    letter-spacing: -1px;
+  }
+  .console-achievements__panel {
+    background: var(--orbit-surface);
+    border-color: var(--orbit-line);
+    border-radius: 14px;
+    padding: 24px;
+  }
+  .console-achievements__game {
+    background: var(--orbit-surface);
+    border-color: var(--orbit-line);
+    border-radius: 10px;
+  }
+  .console-achievements__game:hover {
+    background: #202322;
+    border-color: #d2ee8930;
+  }
+  .console-achievements__cover {
+    border-radius: 7px;
+    background: #252d29;
+  }
+  .console-achievements input,
+  .console-achievements select {
+    background: #141618;
+    border-color: #ffffff18;
+    border-radius: 9px;
+  }
+  .platform-progress {
+    background: var(--orbit-surface);
+    border-color: var(--orbit-line);
+    border-radius: 14px;
+    padding: 24px;
+  }
+  .platform-progress h2 {
+    font-size: 20px;
+    font-weight: 500;
+  }
+  .platform-progress__rows {
+    gap: 0;
+  }
+  .platform-progress article {
+    background: transparent;
+    border-radius: 0;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--orbit-line);
+  }
+  .platform-progress article:last-child {
+    border-bottom: 0;
+  }
+  .platform-progress__numbers {
+    min-width: 200px;
+  }
+  .platform-progress progress {
+    height: 4px;
+  }
+  .platform-progress progress::-webkit-progress-value {
+    background: var(--orbit-accent);
+  }
+  .platform-progress summary {
+    color: #bac6a8;
+  }
+  .platform-progress input,
+  .platform-progress select {
+    border-radius: 8px;
+    border-color: #ffffff18;
+    background: #141618;
+  }
+  .platform-progress button {
+    background: var(--orbit-accent);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  @media (max-width: 1100px) {
+    .home__top-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .home__activity {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 24px;
+    }
+    .home__activity > h3,
+    .home__activity > p {
+      grid-column: 1 / -1;
+    }
+    .home__activity .home__detail {
+      align-self: end;
+      flex-wrap: wrap;
+    }
+  }
+  @media (max-width: 700px) {
+    .home__content,
+    .console-achievements {
+      padding: 20px 16px;
+    }
+    .home__spotlight-content {
+      padding: 24px;
+    }
+    .home__search {
+      width: 100%;
+    }
+    .home__search input {
+      width: 100%;
+    }
+    .settings__container {
+      padding: 12px;
+    }
+    .settings__panel {
+      padding: 20px;
+    }
+    .platform-progress__numbers {
+      min-width: 0;
+      width: 100%;
+    }
+    .library__content {
+      padding: 16px 16px 0;
+    }
+  }
+  @media (max-width: 860px) {
+    .settings__sidebar {
+      min-width: 0;
+      max-width: none;
+      width: 100%;
+      flex-direction: row;
+      flex-wrap: wrap;
+      padding: 12px;
+    }
+    .settings__sidebar-button {
+      width: auto;
+      white-space: normal;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .button,
+    .library-game-card__wrapper,
+    .home__cover {
+      transition: none;
+    }
+  }
+}
