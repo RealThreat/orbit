@@ -22,6 +22,8 @@ import { GameLogo } from "./game-logo";
 import { CloudSaveWidget } from "./cloud-save-v2";
 import { getCloudSaveVisibility } from "./cloud-save-visibility";
 import { SimilarGames } from "./similar-games/similar-games";
+import { GamePlatformProgress } from "@renderer/components/game-platform-progress/game-platform-progress";
+import { pcProgressId } from "@renderer/components/game-platform-progress/progress-model";
 
 import { AuthPage, getDisplayedPlayTimeInMilliseconds } from "@shared";
 import { cloudSyncContext, gameDetailsContext } from "@renderer/context";
@@ -81,6 +83,7 @@ export function GameDetailsContent() {
 
   const {
     objectId,
+    gameTitle,
     shopDetails,
     game,
     presentation,
@@ -472,6 +475,14 @@ export function GameDetailsContent() {
 
         <div className="game-details__description-container">
           <div className="game-details__description-content">
+            <GamePlatformProgress
+              anchorId={pcProgressId(
+                game?.shop ?? shop,
+                game?.objectId ?? objectId ?? ""
+              )}
+              title={game?.title ?? gameTitle}
+              currentGame={game}
+            />
             <DescriptionHeader />
 
             {showPrompt && (

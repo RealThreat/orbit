@@ -3709,6 +3709,11 @@
     "@types/babel__core" "^7.20.5"
     react-refresh "^0.17.0"
 
+"@xboxreplay/xboxlive-auth@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@xboxreplay/xboxlive-auth/-/xboxlive-auth-5.1.0.tgz#18af63fcff899a7b7627fd32dcf0bd19ed32eb9a"
+  integrity sha512-UngHHsehZbiTjyyNmo8HvdoUDKMID1U9uVfrpFWUK/2UxPuVTKy5n+CzZQ3S488sW5vOhgh0lHqqynT8ouwgvw==
+
 "@xmldom/xmldom@^0.8.8":
   version "0.8.13"
   resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.8.13.tgz#00d1dd940b218dff2e49309d410d8bb212159225"
@@ -7757,6 +7762,11 @@ psl@^1.1.33:
   integrity sha512-JZd3gMVBAVQkSs6HdNZo9Sdo0LNcQeMNP3CozBJb3JYC/QUYZTnKxP+f8oWRX4rHP5EurWxqAHTSwUCjlNKa1w==
   dependencies:
     punycode "^2.3.1"
+
+psn-api@^2.18.1:
+  version "2.18.1"
+  resolved "https://registry.yarnpkg.com/psn-api/-/psn-api-2.18.1.tgz#2b70bef22e3562ebde62e00b4aa0d516287344fd"
+  integrity sha512-D0oVrJK+hVwJFARp2Io/auqJwjRx2t7x4Cke7mYNFbrOUQxSBONl0fHr4eVK5Bai89RNyaAsLPLFmgIw9pxzmQ==
 
 pump@^3.0.0:
   version "3.0.3"

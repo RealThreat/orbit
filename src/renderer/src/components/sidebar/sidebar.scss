@@ -1,6 +1,27 @@
 @use "../../scss/globals.scss";
 
 .sidebar {
+  &__orbit-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 26px;
+    color: #ececf1;
+    font-size: 22px;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+
+    span {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 11px;
+      background: #12151d;
+      color: #cdf568;
+    }
+  }
   background-color: globals.$dark-background-color;
   color: globals.$muted-color;
   flex-direction: column;
@@ -118,14 +139,15 @@
     text-wrap: nowrap;
     display: flex;
     color: globals.$muted-color;
-    border-radius: 4px;
+    border-radius: 11px;
 
     &:hover {
       background-color: rgba(255, 255, 255, 0.15);
     }
 
     &--active {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: #1a1c24;
+      color: #cdf568;
     }
 
     &--muted {

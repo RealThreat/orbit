@@ -1,4 +1,6 @@
 import type { AuthPage, Downloader } from "@shared";
+import type { ConsoleAccountsAPI } from "@types";
+import type { OrbitAccountAPI } from "../../types/orbit-account.types";
 import type {
   SystemPowerAction,
   AppUpdaterEvent,
@@ -161,7 +163,7 @@ declare global {
     isFile: boolean;
   };
 
-  interface Electron {
+  interface Electron extends ConsoleAccountsAPI, OrbitAccountAPI {
     onCloudSaveAutomaticSyncModeChanged: (
       callback: (event: CloudSaveAutomaticSyncModeChangedEvent) => void
     ) => () => void;

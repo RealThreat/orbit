@@ -36,6 +36,10 @@ export const createGame = async (game: Game) => {
             "/profile/games",
             {
               objectId: game.objectId,
+              title: local.title,
+              iconUrl: local.iconUrl,
+              libraryHeroImageUrl: local.libraryHeroImageUrl,
+              logoImageUrl: local.logoImageUrl,
               playTimeInMilliseconds: Math.trunc(
                 local.playTimeInMilliseconds ?? 0
               ),

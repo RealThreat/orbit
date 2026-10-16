@@ -1,0 +1,232 @@
+.console-achievements {
+  width: 100%;
+  overflow-y: auto;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  background: #0b0c10;
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #ececf1;
+    font-size: 30px;
+    margin: 8px 0 12px;
+  }
+  h2 {
+    font-size: 20px;
+    color: #ececf1;
+  }
+  h3 {
+    color: #ececf1;
+    font-size: 14px;
+  }
+  &__eyebrow {
+    color: #cdf568;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  &__header > div > p:last-child,
+  &__muted {
+    color: #9294a4;
+    font-size: 12px;
+  }
+  &__connections {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .settings-integration-card__header {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .settings-integration-card__actions {
+    flex-wrap: wrap;
+  }
+  &__panel {
+    border: 1px solid #282a35;
+    background: #14161c;
+    border-radius: 20px;
+    padding: 26px;
+  }
+  &__psn {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  &__actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  input,
+  select {
+    color: #ececf1;
+    background: #15171e;
+    border: 1px solid #353846;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font: inherit;
+    min-width: 0;
+  }
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 520px;
+  }
+  &__psn > .console-achievements__muted {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  &__error {
+    padding: 16px;
+    color: #ffb8b8;
+    background: #3e2028;
+    border-radius: 12px;
+  }
+  &__section-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin: 22px 0 18px;
+  }
+  &__section-heading p,
+  &__section-heading span {
+    font-size: 12px;
+    color: #9294a4;
+  }
+  &__filters {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  &__filters input {
+    flex: 1;
+    min-width: 180px;
+  }
+  &__games {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  &__game {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    padding: 16px;
+    background: #14161c;
+    border: 1px solid #282a35;
+    border-radius: 18px;
+    text-align: left;
+    cursor: pointer;
+    color: #ececf1;
+  }
+  &__game:hover {
+    border-color: #cdf568;
+  }
+  &__game:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+  &__game > div:last-child {
+    min-width: 0;
+    flex: 1;
+  }
+  &__game h3 {
+    margin: 6px 0;
+    overflow-wrap: anywhere;
+  }
+  &__game p {
+    font-size: 12px;
+  }
+  &__cover {
+    width: 72px;
+    height: 96px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background: #251d3b;
+    overflow: hidden;
+    color: #cdf568;
+  }
+  &__cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  progress {
+    width: 100%;
+    height: 5px;
+    border: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+  progress::-webkit-progress-bar {
+    background: #30333e;
+  }
+  progress::-webkit-progress-value {
+    background: #cdf568;
+  }
+  &__details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  &__achievement {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid #282a35;
+    border-radius: 14px;
+    padding: 18px;
+    color: #9294a4;
+  }
+  &__achievement--earned > svg {
+    color: #cdf568;
+  }
+  &__achievement > svg {
+    flex-shrink: 0;
+  }
+  &__achievement > div {
+    flex: 1;
+    min-width: 0;
+  }
+  &__achievement p {
+    margin-top: 5px;
+    font-size: 12px;
+  }
+  &__achievement span {
+    font-size: 11px;
+  }
+  &__reward {
+    text-align: right;
+    white-space: nowrap;
+  }
+  &__empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #9294a4;
+  }
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible {
+    outline: 2px solid #cdf568;
+    outline-offset: 3px;
+  }
+  @media (max-width: 1100px) {
+    padding: 24px;
+    &__connections {
+      grid-template-columns: 1fr;
+    }
+  }
+}

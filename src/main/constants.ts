@@ -2,6 +2,11 @@ import { app } from "electron";
 import path from "node:path";
 import fs from "node:fs";
 import { SystemPath } from "./services/system-path";
+import { APP_NAME } from "@shared";
+
+// Orbit has its own profile; never move, overwrite or delete a Hydra profile.
+app.setName(APP_NAME);
+app.setPath("userData", path.join(app.getPath("appData"), APP_NAME));
 
 // Opt-in isolation for local API testing; packaged installs keep their paths.
 const developmentUserDataPath = import.meta.env.MAIN_VITE_USER_DATA_PATH;
@@ -12,7 +17,9 @@ if (!app.isPackaged && developmentUserDataPath) {
 
 export const defaultDownloadsPath = SystemPath.getPath("downloads");
 
-export const isStaging = import.meta.env.MAIN_VITE_API_URL.includes("staging");
+export const isStaging = (import.meta.env.MAIN_VITE_API_URL ?? "").includes(
+  "staging"
+);
 
 export const windowsStartMenuPath = path.join(
   SystemPath.getPath("appData"),

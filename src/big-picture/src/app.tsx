@@ -174,6 +174,7 @@ export default function App() {
 
   return (
     <Fragment>
+      <OrbitAccountModal />
       <NavigationStateBridge />
       <NavigationAutoScrollBridge />
       <NavigationHistoryBridge />
@@ -224,3 +225,4 @@ export default function App() {
     </Fragment>
   );
 }
+import { OrbitAccountModal } from "../../renderer/src/components/orbit-account/orbit-account-modal";

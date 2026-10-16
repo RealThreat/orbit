@@ -2,6 +2,8 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 import { contextBridge, ipcRenderer } from "electron";
 import { randomUUID } from "node:crypto";
+import type { ConsoleProvider } from "@types";
+import type { OrbitAccountInput } from "../types/orbit-account.types";
 
 import type {
   SystemPowerAction,
@@ -163,6 +165,20 @@ const invokeGameArtifactExport = async (
 };
 
 contextBridge.exposeInMainWorld("electron", {
+  getConsoleAccounts: () => ipcRenderer.invoke("getConsoleAccounts"),
+  connectPlayStation: (npsso: string) =>
+    ipcRenderer.invoke("connectPlayStation", npsso),
+  connectXbox: () => ipcRenderer.invoke("connectXbox"),
+  syncConsoleAccount: (provider: ConsoleProvider, accountId: string) =>
+    ipcRenderer.invoke("syncConsoleAccount", provider, accountId),
+  disconnectConsoleAccount: (provider: ConsoleProvider, accountId: string) =>
+    ipcRenderer.invoke("disconnectConsoleAccount", provider, accountId),
+  getConsoleAchievements: (
+    provider: ConsoleProvider,
+    accountId: string,
+    titleId: string
+  ) =>
+    ipcRenderer.invoke("getConsoleAchievements", provider, accountId, titleId),
   onCloudSaveAutomaticSyncModeChanged: (
     callback: (event: CloudSaveAutomaticSyncModeChangedEvent) => void
   ) => {
@@ -1926,6 +1942,15 @@ contextBridge.exposeInMainWorld("electron", {
   },
 
   /* Auth */
+  getOrbitAccountStatus: () => ipcRenderer.invoke("getOrbitAccountStatus"),
+  submitOrbitAccount: (input: OrbitAccountInput) =>
+    ipcRenderer.invoke("submitOrbitAccount", input),
+  onOrbitAuthRequest: (cb: (page: string) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, page: string) =>
+      cb(page);
+    ipcRenderer.on("on-orbit-auth-request", listener);
+    return () => ipcRenderer.removeListener("on-orbit-auth-request", listener);
+  },
   getAuth: () => ipcRenderer.invoke("getAuth"),
   signOut: () => ipcRenderer.invoke("signOut"),
   openAuthWindow: (page: AuthPage) =>

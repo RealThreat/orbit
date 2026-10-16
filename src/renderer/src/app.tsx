@@ -51,6 +51,7 @@ import { playMessageSound } from "./pages/chat-window/chat-sounds";
 
 import type { UserPreferences } from "@types";
 import "./app.scss";
+import { OrbitAccountModal } from "./components/orbit-account/orbit-account-modal";
 import {
   getAchievementSoundUrl,
   getAchievementSoundVolume,
@@ -741,6 +742,7 @@ export function App() {
       />
 
       <CloudGiftNotificationModal />
+      <OrbitAccountModal />
 
       <ArchiveDeletionModal
         visible={showArchiveDeletionModal}

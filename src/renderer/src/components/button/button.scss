@@ -32,12 +32,14 @@
   }
 
   &--primary {
+    background-color: #cdf568;
+    color: #101309;
     &:hover {
-      background-color: #dadbe1;
+      background-color: #ddff91;
     }
 
     &:disabled {
-      background-color: globals.$muted-color;
+      background-color: #cdf568;
     }
   }
 

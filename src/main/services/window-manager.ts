@@ -1,9 +1,9 @@
 import { is } from "@electron-toolkit/utils";
 import { isStaging } from "@main/constants";
 import { db, gamesSublevel, levelKeys } from "@main/level";
-import icon from "@resources/icon.png?asset";
-import trayIconDark from "@resources/tray-icon-dark.png?asset";
-import trayIcon from "@resources/tray-icon.png?asset";
+import icon from "@resources/orbit/icon.png?asset";
+import trayIconDark from "@resources/orbit/tray-icon-dark.png?asset";
+import trayIcon from "@resources/orbit/tray-icon.png?asset";
 import {
   AUTH_WINDOW_CONTENT_HEIGHT,
   AUTH_WINDOW_CONTENT_WIDTH,
@@ -150,16 +150,16 @@ export class WindowManager {
     // Load the remote URL for development or the local html file for production.
     if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
       window.loadURL(`${process.env["ELECTRON_RENDERER_URL"]}#/${hash}`);
-    } else if (import.meta.env.MAIN_VITE_LAUNCHER_SUBDOMAIN) {
+    } else if (import.meta.env.MAIN_VITE_ORBIT_LAUNCHER_SUBDOMAIN) {
       // Try to load from remote URL in production
       try {
         await window.loadURL(
-          `https://release-v${this.formatVersionNumber(app.getVersion())}.${import.meta.env.MAIN_VITE_LAUNCHER_SUBDOMAIN}#/${hash}`
+          `https://release-v${this.formatVersionNumber(app.getVersion())}.${import.meta.env.MAIN_VITE_ORBIT_LAUNCHER_SUBDOMAIN}#/${hash}`
         );
       } catch (error) {
         // Fall back to local file if remote URL fails
         logger.error(
-          "Failed to load from MAIN_VITE_LAUNCHER_SUBDOMAIN, falling back to local file:",
+          "Failed to load from MAIN_VITE_ORBIT_LAUNCHER_SUBDOMAIN, falling back to local file:",
           error
         );
         window.loadFile(path.join(__dirname, "../renderer/index.html"), {
@@ -1037,7 +1037,7 @@ export class WindowManager {
     const connectionWindow = new BrowserWindow({
       width: layout.width,
       height: layout.height,
-      title: "Hydra",
+      title: "Orbit",
       backgroundColor: "#1c1c1c",
       parent: parentWindow,
       modal: true,
@@ -1395,7 +1395,7 @@ export class WindowManager {
       tray.popUpContextMenu(contextMenu);
     };
 
-    tray.setToolTip("Hydra Launcher");
+    tray.setToolTip("Orbit Launcher");
 
     if (process.platform === "win32") {
       await updateSystemTray();

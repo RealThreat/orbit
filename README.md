@@ -1,3 +1,13 @@
+# Orbit Launcher
+
+Independent fork of Hydra maintained by [RealThreat](https://github.com/RealThreat/orbit), with an Orbit interface and application identity. Orbit is not an official Hydra release.
+
+Based on Hydra by Los Broxas, distributed under the original [MIT license](LICENSE). Existing integrations are retained. See [Orbit branding and compatibility](docs/ORBIT-BRANDING.md) for packaging, assets, profiles and protocol details.
+
+The original upstream documentation follows.
+
+---
+
 <div align="center">
 
 [<img src="https://raw.githubusercontent.com/hydralauncher/hydra/refs/heads/main/resources/icon.png" width="144"/>](https://help.hydralauncher.gg)
