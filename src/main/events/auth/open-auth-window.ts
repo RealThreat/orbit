@@ -1,24 +1,15 @@
-import i18next from "i18next";
 import { registerEvent } from "../register-event";
-import { HydraApi, WindowManager } from "@main/services";
 import { AuthPage } from "@shared";
+import { assertTrustedEpicSender } from "../epic/assert-trusted-sender";
 
 const openAuthWindow = async (
   _event: Electron.IpcMainInvokeEvent,
   page: AuthPage
 ) => {
-  const searchParams = new URLSearchParams({
-    lng: i18next.language,
-  });
-
-  if ([AuthPage.UpdateEmail, AuthPage.UpdatePassword].includes(page)) {
-    const { accessToken } = await HydraApi.refreshToken().catch(() => {
-      return { accessToken: "" };
-    });
-    searchParams.set("token", accessToken);
-  }
-
-  WindowManager.openAuthWindow(page, searchParams);
+  assertTrustedEpicSender(_event, true);
+  if (!Object.values(AuthPage).includes(page))
+    throw new Error("Invalid account page");
+  _event.sender.send("on-orbit-auth-request", page);
 };
 
 registerEvent("openAuthWindow", openAuthWindow);

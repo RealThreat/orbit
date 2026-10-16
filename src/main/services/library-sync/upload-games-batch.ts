@@ -54,6 +54,13 @@ const uploadLocalGamesAndMerge = async () => {
             "/profile/games/batch",
             latest.map((game) => ({
               objectId: game.objectId,
+              title: game.title,
+              iconUrl: game.iconUrl,
+              libraryHeroImageUrl: game.libraryHeroImageUrl,
+              logoImageUrl: game.logoImageUrl,
+              canonicalId: game.canonicalId,
+              achievementCount: game.achievementCount,
+              unlockedAchievementCount: game.unlockedAchievementCount,
               playTimeInMilliseconds: Math.trunc(game.playTimeInMilliseconds),
               shop: game.shop,
               lastTimePlayed: game.lastTimePlayed,

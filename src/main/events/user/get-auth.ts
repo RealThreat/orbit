@@ -1,11 +1,15 @@
-import { db, levelKeys } from "@main/level";
-import type { Auth } from "@types";
+import { HydraApi } from "@main/services";
 
 import { registerEvent } from "../register-event";
 
 const getAuth = async (_event: Electron.IpcMainInvokeEvent) =>
-  db.get<string, Auth>(levelKeys.auth, {
-    valueEncoding: "json",
-  });
+  HydraApi.isLoggedIn()
+    ? {
+        accessToken: "",
+        refreshToken: "",
+        workwondersJwt: "",
+        tokenExpirationTimestamp: 0,
+      }
+    : null;
 
 registerEvent("getAuth", getAuth);

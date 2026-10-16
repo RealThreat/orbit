@@ -3,6 +3,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { randomUUID } from "node:crypto";
 import type { ConsoleProvider } from "@types";
+import type { OrbitAccountInput } from "../types/orbit-account.types";
 
 import type {
   SystemPowerAction,
@@ -1941,6 +1942,15 @@ contextBridge.exposeInMainWorld("electron", {
   },
 
   /* Auth */
+  getOrbitAccountStatus: () => ipcRenderer.invoke("getOrbitAccountStatus"),
+  submitOrbitAccount: (input: OrbitAccountInput) =>
+    ipcRenderer.invoke("submitOrbitAccount", input),
+  onOrbitAuthRequest: (cb: (page: string) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, page: string) =>
+      cb(page);
+    ipcRenderer.on("on-orbit-auth-request", listener);
+    return () => ipcRenderer.removeListener("on-orbit-auth-request", listener);
+  },
   getAuth: () => ipcRenderer.invoke("getAuth"),
   signOut: () => ipcRenderer.invoke("signOut"),
   openAuthWindow: (page: AuthPage) =>

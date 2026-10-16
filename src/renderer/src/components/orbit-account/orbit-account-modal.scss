@@ -1,0 +1,28 @@
+.modal.orbit-account-dialog {
+  width: 480px;
+  max-width: calc(100vw - 32px);
+}
+.orbit-account {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+  width: 100%;
+  &__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  &__notice {
+    padding: 14px;
+    border: 1px solid #d2ee8930;
+    background: #d2ee8908;
+    border-radius: 9px;
+    line-height: 1.6;
+    color: #c7d7ae;
+  }
+  &__error {
+    color: #ff9eb0;
+    line-height: 1.6;
+  }
+}

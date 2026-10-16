@@ -1,6 +1,9 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
+  readonly MAIN_VITE_ORBIT_LAUNCHER_SUBDOMAIN: string;
+  readonly MAIN_VITE_ORBIT_SUPABASE_URL: string;
+  readonly MAIN_VITE_ORBIT_SUPABASE_KEY: string;
   readonly MAIN_VITE_API_URL: string;
   readonly MAIN_VITE_ANALYTICS_API_URL: string;
   readonly MAIN_VITE_AUTH_URL: string;

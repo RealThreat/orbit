@@ -1,0 +1,6 @@
+project_id = "orbit-launcher"
+
+[functions.orbit-api]
+# The handler validates the bearer with Auth /user before accessing RLS-scoped data.
+# This supports both publishable keys and the newer JWT signing keys.
+verify_jwt = false

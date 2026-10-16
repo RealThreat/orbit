@@ -37,7 +37,7 @@ const unauthorized = () =>
     status: 401,
   } as never);
 const token = (userId: string) =>
-  jwt.sign({ userId }, "test", { noTimestamp: true });
+  jwt.sign({ userId, sub: userId }, "test", { noTimestamp: true });
 const profile = (id: string) => ({
   id,
   displayName: id,
@@ -79,6 +79,7 @@ async function fixture(t: TestContext, apiUrl = "http://localhost:3000") {
     batch: async () => undefined as void,
   };
   const harness = {
+    values,
     adapter: async (config: InternalAxiosRequestConfig) => {
       const request = {
         method: config.method,
@@ -128,6 +129,17 @@ async function fixture(t: TestContext, apiUrl = "http://localhost:3000") {
     await fs.rm(root, { recursive: true, force: true });
   });
   const stubs: Record<string, string> = {
+    "./orbit-account": `
+      export const getOrbitConfig = () => ({ url: ${JSON.stringify(apiUrl)}, api: ${JSON.stringify(apiUrl)}, key: 'public-test-key' });
+      export const readOrbitAuth = async () => harness.values.has('auth') ? harness.db.get('auth') : undefined;
+      export const writeOrbitAuth = auth => harness.db.put('auth', auth);
+      export const clearOrbitAuth = () => harness.db.batch([{key:'auth'}]);
+      export const orbitSession = data => ({ ...data, refreshToken: data.refreshToken ?? 'rotated-test-token' });
+      export const orbitAuthRequest = async (path, body) => {
+        if (path.startsWith('/logout')) return {};
+        return (await harness.adapter({method:'post',url:'/auth/refresh',data:body,timeout:20000,headers:{}})).data;
+      };
+    `,
     axios:
       "import axios from 'real-axios'; export { AxiosError } from 'real-axios'; export default { create: options => axios.create({ ...options, adapter: harness.adapter }) };",
     "./window-manager": "export const WindowManager = harness.WindowManager;",
@@ -223,18 +235,12 @@ async function fixture(t: TestContext, apiUrl = "http://localhost:3000") {
     hooks,
     respond,
     signIn: (userId: string) =>
-      api.handleExternalAuth(
-        "hydra://auth?payload=" +
-          encodeURIComponent(
-            Buffer.from(
-              JSON.stringify({
-                accessToken: token(userId),
-                refreshToken: userId,
-                expiresIn: 3600,
-              })
-            ).toString("base64")
-          )
-      ),
+      api.handleOrbitAuth({
+        accessToken: token(userId),
+        refreshToken: userId,
+        expiresIn: 3600,
+        workwondersJwt: "",
+      }),
     expire: () => {
       Reflect.get(api, "userAuth").expirationTimestamp = 0;
     },
@@ -249,6 +255,56 @@ test("auth context removes trailing slashes without changing the API path", asyn
     "http://localhost:3000/api//v1"
   );
   assert.equal(f.api.getAuthContext()?.userId, "A");
+});
+
+test("public requests never carry Orbit credentials and upstream 401 does not sign Orbit out", async (t) => {
+  const f = await fixture(t);
+  await f.signIn("A");
+  await f.api.get("/games/steam/10/achievements");
+  const request = f.requests.at(-1)!;
+  assert.equal(request.config.headers.Authorization, undefined);
+  assert.equal(request.config.headers.apikey, undefined);
+  assert.equal(request.config.maxRedirects, 0);
+  f.hooks.request = async () => {
+    throw unauthorized();
+  };
+  await assert.rejects(f.api.post("/catalogue/search", { query: "Halo" }));
+  assert.equal(f.api.isLoggedIn(), true);
+});
+
+test("private routes stay on Orbit even when a caller labels them unauthenticated", async (t) => {
+  const f = await fixture(t, "https://orbit.example/api");
+  await f.signIn("A");
+  await f.api.get("/profile/me", null, { needsAuth: false });
+  assert.equal(f.requests.at(-1)?.config.baseURL, "https://orbit.example/api");
+  assert.equal(f.requests.at(-1)?.config.headers.apikey, "public-test-key");
+  assert.equal(
+    f.requests.at(-1)?.config.headers.Authorization,
+    "Bearer " + token("A")
+  );
+  const count = f.requests.length;
+  await assert.rejects(f.api.get("https://evil.test/profile/me"));
+  assert.equal(f.requests.length, count);
+  await assert.rejects(
+    f.api.handleExternalAuth("hydralauncher://auth?payload=anything")
+  );
+  assert.equal(f.api.getAuthContext()?.userId, "A");
+});
+
+test("Orbit refresh tokens rotate and persist before the next request", async (t) => {
+  const f = await fixture(t);
+  await f.signIn("A");
+  f.expire();
+  f.hooks.request = async (request) =>
+    request.url === "/auth/refresh"
+      ? response({
+          accessToken: token("A"),
+          refreshToken: "rotated-canary",
+          expiresIn: 3600,
+        })
+      : f.respond(request);
+  await f.api.get(endpoint);
+  assert.equal((f.values.get("auth") as Auth).refreshToken, "rotated-canary");
 });
 
 test("late refresh or 401 from A never dispatches Epic access token or changes B", async (t) => {
@@ -322,7 +378,7 @@ test("logout and switching accounts serialize auth/profile writes and cleanup", 
     await f.api.setupApi();
     assert.equal(f.api.isLoggedIn(), false);
     assert.equal(f.values.has("auth"), false);
-    assert.equal(f.values.has("user"), false);
+    assert.equal((f.values.get("user") as { id: string })?.id, "B");
   }
 });
 

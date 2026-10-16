@@ -1,8 +1,7 @@
 import { shell } from "electron";
 import { registerEvent } from "../register-event";
 import { HydraApi } from "@main/services";
-import { db, levelKeys } from "@main/level";
-import type { Auth, OpenCheckoutOptions } from "@types";
+import type { OpenCheckoutOptions } from "@types";
 
 const isAllowedPath = (path: string) =>
   path === "/" || path === "/gift" || /^\/gifts\/[A-Za-z0-9]{8}$/.test(path);
@@ -13,19 +12,17 @@ const openCheckout = async (
   _event: Electron.IpcMainInvokeEvent,
   options?: OpenCheckoutOptions
 ) => {
-  const auth = await db.get<string, Auth>(levelKeys.auth, {
-    valueEncoding: "json",
-  });
-
-  if (!auth) {
+  if (!HydraApi.isLoggedIn()) {
     return;
   }
 
-  const paymentToken = await HydraApi.post("/auth/payment", {
-    refreshToken: auth.refreshToken,
-  }).then((response) => response.accessToken);
+  if (!import.meta.env.MAIN_VITE_ORBIT_CHECKOUT_URL)
+    throw new Error("Orbit checkout is not configured");
+  const paymentToken = await HydraApi.post("/auth/payment").then(
+    (response) => response.accessToken
+  );
 
-  const checkoutUrl = new URL(import.meta.env.MAIN_VITE_CHECKOUT_URL);
+  const checkoutUrl = new URL(import.meta.env.MAIN_VITE_ORBIT_CHECKOUT_URL);
 
   if (options?.path && isAllowedPath(options.path)) {
     checkoutUrl.pathname = options.path;

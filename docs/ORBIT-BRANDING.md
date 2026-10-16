@@ -38,14 +38,16 @@ library therefore does not automatically appear in the new Orbit profile.
 The internal `hydra-db` name, persistence keys and IPC names remain compatible.
 
 New game shortcuts use `orbitlauncher://run`. Orbit also continues to register
-and accept `hydralauncher://` while the existing authentication services return
-legacy callbacks. This legacy association is shared with Hydra: the last app to
+and accept `hydralauncher://` for legacy game-link compatibility. Hydra account
+callbacks are refused by the Orbit account client. This legacy association is shared with Hydra: the last app to
 register it can become the OS handler. Full protocol coexistence requires a
 separate authentication/compatibility decision; it is not claimed here.
 
-Hydra API/auth/checkout/cloud/Decky integrations, service-specific logos,
-account wording, URLs and upstream dependency identities are retained. Changing
-Orbit's public identity does not make those services Orbit-owned.
+Public Hydra catalogue/metadata utilities and Decky release information remain
+available without Orbit credentials. Account-facing routes now belong to Orbit;
+see `docs/ORBIT-ACCOUNTS.md` for Supabase setup and migration gaps. Service-specific
+logos, upstream dependency identities and existing feature implementations are retained.
+Changing Orbit's public identity does not make upstream services Orbit-owned.
 
 ## Before public distribution
 

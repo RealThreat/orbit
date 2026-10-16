@@ -3,7 +3,15 @@ import { clearStaleEpicImports } from "./epic/import-cleanup";
 import axios, { AxiosError, AxiosInstance } from "axios";
 import jwt from "jsonwebtoken";
 import { WindowManager } from "./window-manager";
-import url from "url";
+import { apiDestination } from "../../shared/orbit-api-policy";
+import {
+  getOrbitConfig,
+  readOrbitAuth,
+  writeOrbitAuth,
+  clearOrbitAuth,
+  orbitAuthRequest,
+  orbitSession,
+} from "./orbit-account";
 import { uploadGamesBatch } from "./library-sync";
 import { clearGamesRemoteIds } from "./library-sync/clear-games-remote-id";
 import { networkLogger as logger } from "./logger";
@@ -67,6 +75,9 @@ export class HydraApi {
   public static getAuthContext() {
     return this.authContexts.getContext();
   }
+  public static getAccountGeneration() {
+    return this.authContexts.generation;
+  }
 
   public static isAuthContextCurrent(context: HydraApiAuthContext) {
     return this.authContexts.isCurrent(context);
@@ -79,11 +90,11 @@ export class HydraApi {
   private static activateAuthContext(generation: number) {
     const claims = jwt.decode(this.userAuth.authToken);
     const userId =
-      claims && typeof claims === "object" && typeof claims.userId === "string"
-        ? claims.userId
+      claims && typeof claims === "object" && typeof claims.sub === "string"
+        ? claims.sub
         : null;
     this.authContexts.activate(
-      trimTrailingSlashes(import.meta.env.MAIN_VITE_API_URL),
+      trimTrailingSlashes(getOrbitConfig()?.url ?? "orbit:unconfigured"),
       userId,
       generation
     );
@@ -98,9 +109,7 @@ export class HydraApi {
   private static persistAuth(auth: Auth, generation: number) {
     return this.queueAuthPersistence(async () => {
       this.assertAuthGeneration(generation);
-      await db.put<string, Auth>(levelKeys.auth, auth, {
-        valueEncoding: "json",
-      });
+      await writeOrbitAuth(auth);
       this.assertAuthGeneration(generation);
     });
   }
@@ -125,16 +134,12 @@ export class HydraApi {
     // Queue immediately when the session is invalidated. A preceding write must
     // finish before deletion; a later login persists only after deletion/cleanup.
     return this.queueAuthPersistence(async () => {
-      await db.batch([
-        { type: "del", key: levelKeys.auth },
-        { type: "del", key: levelKeys.user },
-      ]);
+      await clearOrbitAuth();
       await cleanupUserData?.();
     });
   }
 
   private static readonly EXPIRATION_OFFSET_IN_MS = 1000 * 60 * 5; // 5 minutes
-  private static readonly AUTH_REFRESH_TIMEOUT_MS = 20_000;
   private static readonly ADD_LOG_INTERCEPTOR = true;
 
   private static secondsToMilliseconds(seconds: number) {
@@ -204,11 +209,17 @@ export class HydraApi {
   }
 
   static async handleExternalAuth(uri: string) {
-    const { payload } = url.parse(uri, true).query;
+    // Never accept an upstream account (or tokens supplied by an arbitrary URI).
+    void uri;
+    throw new Error("Orbit accounts must authenticate with Orbit");
+  }
 
-    const decodedBase64 = atob(payload as string);
-    const jsonData = JSON.parse(decodedBase64);
-
+  static async handleOrbitAuth(jsonData: {
+    accessToken: string;
+    expiresIn: number;
+    refreshToken: string;
+    workwondersJwt: string;
+  }) {
     const { accessToken, expiresIn, refreshToken, workwondersJwt } = jsonData;
 
     const generation = this.authContexts.invalidate();
@@ -313,6 +324,7 @@ export class HydraApi {
   }
 
   static async handleSignOut(cleanupUserData?: () => Promise<void>) {
+    const previousToken = this.userAuth.authToken;
     const generation = this.authContexts.invalidate();
     clearGamesPlaytimeState();
     this.userAuth = {
@@ -355,16 +367,10 @@ export class HydraApi {
       this.sendSignOutEvent();
       // Preserve the legacy unauthenticated call without reading a future
       // account's token after an asynchronous request-validation gap.
-      this.instance
-        .post(
-          "/auth/logout",
-          {},
-          {
-            headers: { Authorization: "Bearer " },
-            timeout: this.AUTH_REFRESH_TIMEOUT_MS,
-          }
-        )
-        .catch(() => {});
+      if (previousToken)
+        void orbitAuthRequest("/logout?scope=local", {}, previousToken).catch(
+          () => {}
+        );
     } finally {
       await persistence;
     }
@@ -372,8 +378,30 @@ export class HydraApi {
 
   static async setupApi() {
     this.instance = axios.create({
-      baseURL: import.meta.env.MAIN_VITE_API_URL,
-      headers: { "User-Agent": `Hydra Launcher v${appVersion}` },
+      headers: { "User-Agent": `Orbit Launcher v${appVersion}` },
+      timeout: 15_000,
+      maxRedirects: 0,
+    });
+
+    this.instance.interceptors.request.use((request) => {
+      const destination = apiDestination(
+        request.method ?? "get",
+        request.url ?? ""
+      );
+      if (destination === "hydra-public") {
+        if (!import.meta.env.MAIN_VITE_API_URL)
+          throw new Error("Public catalogue is not configured");
+        request.baseURL = import.meta.env.MAIN_VITE_API_URL;
+        request.headers.delete("Authorization");
+        request.headers.delete("apikey");
+        request.headers.delete("Cookie");
+      } else {
+        const config = getOrbitConfig();
+        if (!config) throw new Error("Orbit services are not configured");
+        request.baseURL = config.api;
+        request.headers.set("apikey", config.key);
+      }
+      return request;
     });
 
     if (this.ADD_LOG_INTERCEPTOR) {
@@ -447,12 +475,16 @@ export class HydraApi {
       );
     }
 
-    const result = await db.getMany<string>([levelKeys.auth, levelKeys.user], {
+    // Legacy Hydra credentials remain untouched and are never loaded into Orbit.
+    const userAuth = await readOrbitAuth().catch(() => {
+      // A locked/corrupt session must not prevent use of the local launcher.
+      // Preserve the stored record for recovery, and remain signed out.
+      logger.error("Orbit session could not be read securely");
+      return undefined;
+    });
+    const [user] = await db.getMany<string, User>([levelKeys.user], {
       valueEncoding: "json",
     });
-
-    const userAuth = result.at(0) as Auth | undefined;
-    const user = result.at(1) as User | undefined;
 
     this.userAuth = {
       authToken: userAuth?.accessToken ?? "",
@@ -504,16 +536,14 @@ export class HydraApi {
 
   private static async performTokenRefresh(generation: number) {
     const previousAuth = this.userAuth;
-    const response = await this.instance.post(
-      `/auth/refresh`,
-      {
-        refreshToken: previousAuth.refreshToken,
-      },
-      { timeout: this.AUTH_REFRESH_TIMEOUT_MS }
+    const refreshed = orbitSession(
+      await orbitAuthRequest("/token?grant_type=refresh_token", {
+        refresh_token: previousAuth.refreshToken,
+      })
     );
     this.assertAuthGeneration(generation);
 
-    const { accessToken, expiresIn } = response.data;
+    const { accessToken, expiresIn, refreshToken } = refreshed;
 
     const tokenExpirationTimestamp =
       Date.now() +
@@ -523,6 +553,7 @@ export class HydraApi {
     this.userAuth = {
       ...previousAuth,
       authToken: accessToken,
+      refreshToken,
       expirationTimestamp: tokenExpirationTimestamp,
     };
 
@@ -531,19 +562,19 @@ export class HydraApi {
       this.userAuth.expirationTimestamp
     );
 
-    await db
-      .get<string, Auth>(levelKeys.auth, { valueEncoding: "json" })
-      .then((auth) => {
-        this.assertAuthGeneration(generation);
-        return this.persistAuth(
-          {
-            ...auth,
-            accessToken,
-            tokenExpirationTimestamp,
-          },
-          generation
-        );
-      });
+    await readOrbitAuth().then((auth) => {
+      this.assertAuthGeneration(generation);
+      return this.persistAuth(
+        {
+          ...auth,
+          workwondersJwt: "",
+          accessToken,
+          refreshToken,
+          tokenExpirationTimestamp,
+        },
+        generation
+      );
+    });
 
     return { accessToken, expiresIn };
   }
@@ -708,11 +739,22 @@ export class HydraApi {
     return this.handleUnauthorizedError(err, generation);
   }
 
+  private static routeOptions(
+    method: string,
+    path: string,
+    options?: HydraApiOptions
+  ): HydraApiOptions | undefined {
+    return apiDestination(method, path) === "hydra-public"
+      ? { ...options, needsAuth: false, needsSubscription: false }
+      : options;
+  }
+
   static async get<T = any>(
     url: string,
     params?: any,
     options?: HydraApiOptions
   ) {
+    options = this.routeOptions("GET", url, options);
     const generation = await this.validateOptions(options);
     const config = this.requestConfig(options, generation);
     return this.instance
@@ -737,6 +779,7 @@ export class HydraApi {
     params?: any,
     options?: HydraApiOptions
   ) {
+    options = this.routeOptions("GET", url, options);
     const generation = await this.validateOptions(options);
     const config = this.requestConfig(options, generation);
     return this.instance
@@ -765,6 +808,7 @@ export class HydraApi {
     data?: any,
     options?: HydraApiOptions
   ) {
+    options = this.routeOptions("POST", url, options);
     const generation = await this.validateOptions(options);
     return this.instance
       .post<T>(url, data, this.requestConfig(options, generation))
@@ -780,6 +824,7 @@ export class HydraApi {
     data?: unknown,
     options?: HydraApiOptions
   ) {
+    options = this.routeOptions("POST", url, options);
     const generation = await this.validateOptions(options);
     return this.instance
       .post<T>(url, data, this.requestConfig(options, generation))
@@ -795,6 +840,7 @@ export class HydraApi {
     data?: any,
     options?: HydraApiOptions
   ) {
+    options = this.routeOptions("PUT", url, options);
     const generation = await this.validateOptions(options);
     return this.instance
       .put<T>(url, data, this.requestConfig(options, generation))
@@ -810,6 +856,7 @@ export class HydraApi {
     data?: any,
     options?: HydraApiOptions
   ) {
+    options = this.routeOptions("PATCH", url, options);
     const generation = await this.validateOptions(options);
     return this.instance
       .patch<T>(url, data, this.requestConfig(options, generation))
@@ -821,6 +868,7 @@ export class HydraApi {
   }
 
   static async delete<T = any>(url: string, options?: HydraApiOptions) {
+    options = this.routeOptions("DELETE", url, options);
     const generation = await this.validateOptions(options);
     return this.instance
       .delete<T>(url, this.requestConfig(options, generation))

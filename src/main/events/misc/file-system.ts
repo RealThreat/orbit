@@ -22,7 +22,7 @@ interface PathInfo {
 }
 
 function getReleaseRendererOrigin(): string | null {
-  const subdomain = import.meta.env.MAIN_VITE_LAUNCHER_SUBDOMAIN;
+  const subdomain = import.meta.env.MAIN_VITE_ORBIT_LAUNCHER_SUBDOMAIN;
   if (!subdomain) return null;
 
   try {
