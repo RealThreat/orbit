@@ -1,4 +1,5 @@
 import type { AuthPage, Downloader } from "@shared";
+import type { ConsoleAccountsAPI } from "@types";
 import type {
   SystemPowerAction,
   AppUpdaterEvent,
@@ -161,7 +162,7 @@ declare global {
     isFile: boolean;
   };
 
-  interface Electron {
+  interface Electron extends ConsoleAccountsAPI {
     onCloudSaveAutomaticSyncModeChanged: (
       callback: (event: CloudSaveAutomaticSyncModeChangedEvent) => void
     ) => () => void;

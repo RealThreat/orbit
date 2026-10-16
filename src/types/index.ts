@@ -916,6 +916,7 @@ export * from "./retroarch.types";
 export * from "./artwork.types";
 export * from "./cloud-save.types";
 export * from "./souvenir.types";
+export * from "./console-accounts.types";
 
 export type ExtractionFailure =
   | { reason: "unsupported-format"; format: string }

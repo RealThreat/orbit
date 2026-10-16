@@ -11,6 +11,8 @@ afterSign: scripts/legendary-after-pack.cjs
 directories:
   buildResources: build
 extraResources:
+  - from: resources/console-integrations
+    to: console-integrations
   - ludusavi
   - hydra-native
   - seeds

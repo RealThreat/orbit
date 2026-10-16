@@ -1,6 +1,7 @@
 name: Release
 
 env:
+  MAIN_VITE_XBOX_CLIENT_ID: ${{ vars.MAIN_VITE_XBOX_CLIENT_ID }}
   RELEASE_ARTIFACT_RETENTION_DAYS: 7
 
 concurrency:

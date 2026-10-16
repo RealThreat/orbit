@@ -35,6 +35,7 @@ import GameDetails from "./pages/game-details/game-details";
 import Settings from "./pages/settings/settings";
 import Profile from "./pages/profile/profile";
 import Achievements from "./pages/achievements/achievements";
+import ConsoleAchievements from "./pages/console-achievements/console-achievements";
 import ThemeEditor from "./pages/theme-editor/theme-editor";
 import Library from "./pages/library/library";
 import Notifications from "./pages/notifications/notifications";
@@ -147,6 +148,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/profile/:userId" element={<Profile />} />
                   <Route path="/achievements" element={<Achievements />} />
+                  <Route
+                    path="/console-achievements"
+                    element={<ConsoleAchievements />}
+                  />
                   <Route path="/notifications" element={<Notifications />} />
                 </Route>
 
