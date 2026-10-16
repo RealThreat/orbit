@@ -1,9 +1,9 @@
 import { is } from "@electron-toolkit/utils";
 import { isStaging } from "@main/constants";
 import { db, gamesSublevel, levelKeys } from "@main/level";
-import icon from "@resources/icon.png?asset";
-import trayIconDark from "@resources/tray-icon-dark.png?asset";
-import trayIcon from "@resources/tray-icon.png?asset";
+import icon from "@resources/orbit/icon.png?asset";
+import trayIconDark from "@resources/orbit/tray-icon-dark.png?asset";
+import trayIcon from "@resources/orbit/tray-icon.png?asset";
 import {
   AUTH_WINDOW_CONTENT_HEIGHT,
   AUTH_WINDOW_CONTENT_WIDTH,
@@ -1037,7 +1037,7 @@ export class WindowManager {
     const connectionWindow = new BrowserWindow({
       width: layout.width,
       height: layout.height,
-      title: "Hydra",
+      title: "Orbit",
       backgroundColor: "#1c1c1c",
       parent: parentWindow,
       modal: true,
@@ -1395,7 +1395,7 @@ export class WindowManager {
       tray.popUpContextMenu(contextMenu);
     };
 
-    tray.setToolTip("Hydra Launcher");
+    tray.setToolTip("Orbit Launcher");
 
     if (process.platform === "win32") {
       await updateSystemTray();

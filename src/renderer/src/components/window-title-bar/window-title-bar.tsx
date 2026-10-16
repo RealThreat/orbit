@@ -8,6 +8,7 @@ import {
   WINDOW_TITLE_BAR_TRANSITION_DURATION_MS,
 } from "@shared";
 import "./window-title-bar.scss";
+import { APP_NAME } from "@shared";
 
 const titleBarStyle = {
   "--window-title-bar-height": `${CUSTOM_WINDOW_TITLE_BAR_HEIGHT}px`,
@@ -28,7 +29,7 @@ export function WindowTitleBar({
 
   return (
     <header className="window-title-bar" style={titleBarStyle}>
-      <h4>Hydra</h4>
+      <h4>{APP_NAME}</h4>
       <div className="window-title-bar__controls">
         <button
           type="button"

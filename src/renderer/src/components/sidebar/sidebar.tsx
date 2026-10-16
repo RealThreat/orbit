@@ -21,6 +21,7 @@ import { selectIsLibraryLoading } from "@renderer/features";
 import { routes } from "./routes";
 
 import "./sidebar.scss";
+import OrbitIcon from "@renderer/assets/icons/orbit.svg?react";
 
 import { buildGameDetailsPath, sortLibraryGames } from "@renderer/helpers";
 import {
@@ -511,7 +512,10 @@ export function Sidebar() {
 
       <div className="sidebar__container">
         <button className="sidebar__orbit-brand" onClick={() => navigate("/")}>
-          <span aria-hidden="true">◒</span> Orbit
+          <span aria-hidden="true">
+            <OrbitIcon width={24} height={24} />
+          </span>{" "}
+          Orbit
         </button>
         <SidebarProfile />
 

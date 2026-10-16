@@ -1,12 +1,12 @@
 import { Notification } from "electron";
 import { t } from "i18next";
-import trayIcon from "@resources/tray-icon.png?asset";
+import trayIcon from "@resources/orbit/tray-icon.png?asset";
 import fs from "node:fs";
 import axios from "axios";
 import path from "node:path";
 import sound from "sound-play";
 import { achievementSoundPath, chatMessageSoundPath } from "@main/constants";
-import icon from "@resources/icon.png?asset";
+import icon from "@resources/orbit/icon.png?asset";
 import { NotificationOptions, toXmlString } from "./xml";
 import { logger } from "../logger";
 import { WindowManager } from "../window-manager";

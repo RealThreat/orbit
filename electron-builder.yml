@@ -1,5 +1,10 @@
-appId: gg.hydralauncher.hydra
-productName: Hydra
+appId: io.github.realthreat.orbit
+productName: Orbit
+protocols:
+  - name: Orbit Launcher
+    schemes:
+      - orbitlauncher
+      - hydralauncher
 beforePack: scripts/legendary-before-pack.cjs
 afterPack: scripts/legendary-after-pack.cjs
 afterSign: scripts/legendary-after-pack.cjs
@@ -34,7 +39,8 @@ asarUnpack:
   - node_modules/sharp/**
   - node_modules/@img/sharp-libvips-*/**
 win:
-  executableName: Hydra
+  executableName: Orbit
+  icon: build/orbit/icon.ico
   extraResources:
     - from: legendary/win32/${arch}
       to: legendary
@@ -58,6 +64,8 @@ win:
     - nsis
     - portable
 nsis:
+  installerSidebar: build/orbit/installerSidebar.bmp
+  uninstallerSidebar: build/orbit/installerSidebar.bmp
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
@@ -69,6 +77,7 @@ portable:
   artifactName: ${name}-${version}-portable.${ext}
   unpackDirName: false
 mac:
+  icon: build/orbit/icon.icns
   sign: scripts/legendary-mac-sign.cjs
   entitlementsInherit: build/entitlements.mac.plist
   extraResources:
@@ -91,6 +100,7 @@ mac:
 dmg:
   artifactName: ${name}-${version}.${ext}
 linux:
+  icon: build/orbit/icon.png
   extraResources:
     - from: binaries/epic-prerequisite-runner/x64
       to: epic
@@ -123,16 +133,17 @@ linux:
     - snap
     - deb
     - rpm
-  maintainer: electronjs.org
+  maintainer: RealThreat <139633064+RealThreat@users.noreply.github.com>
   category: Game
   mimeTypes:
+    - x-scheme-handler/orbitlauncher
     - x-scheme-handler/hydralauncher
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: github
-  owner: hydralauncher
-  repo: hydra
+  owner: RealThreat
+  repo: orbit
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/

@@ -42,6 +42,15 @@ import {
 } from "./services/steam-integration/steam-openid-return";
 import { steamSyncOrchestrator } from "./services/steam-integration/steam-sync-orchestrator";
 import {
+  APP_ID,
+  APP_PROTOCOL,
+  LEGACY_APP_PROTOCOL,
+  APP_RELEASE_OWNER,
+  APP_RELEASE_REPO,
+  isAppDeepLink,
+  isRunDeepLink as isGameRunDeepLink,
+} from "@shared";
+import {
   initializeEpicIntegration,
   shutdownEpicIntegration,
   suspendEpicPlaytime,
@@ -56,8 +65,8 @@ const { autoUpdater } = updater;
 
 autoUpdater.setFeedURL({
   provider: "github",
-  owner: "hydralauncher",
-  repo: "hydra",
+  owner: APP_RELEASE_OWNER,
+  repo: APP_RELEASE_REPO,
 });
 
 autoUpdater.logger = logger;
@@ -78,7 +87,8 @@ i18n.init({
   },
 });
 
-const PROTOCOL = "hydralauncher";
+// Keep legacy registration while the existing auth services return Hydra URLs.
+const PROTOCOLS = [APP_PROTOCOL, LEGACY_APP_PROTOCOL];
 
 // Register the custom schemes as privileged so the renderer can fetch them
 // (supportFetchAPI) and use the results on a canvas without tainting it
@@ -94,19 +104,21 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
-if (process.defaultApp) {
-  if (process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, [
-      path.resolve(process.argv[1]),
-    ]);
+for (const protocolName of PROTOCOLS) {
+  if (process.defaultApp) {
+    if (process.argv.length >= 2) {
+      app.setAsDefaultProtocolClient(protocolName, process.execPath, [
+        path.resolve(process.argv[1]),
+      ]);
+    }
+  } else {
+    app.setAsDefaultProtocolClient(protocolName);
   }
-} else {
-  app.setAsDefaultProtocolClient(PROTOCOL);
 }
 
 const initializeApp = async () => {
   refreshPortableShortcutLauncher();
-  electronApp.setAppUserModelId("gg.hydralauncher.hydra");
+  electronApp.setAppUserModelId(APP_ID);
 
   logger.info("Crash dumps directory", app.getPath("crashDumps"));
 
@@ -210,11 +222,9 @@ const initializeApp = async () => {
   if (language) i18n.changeLanguage(language);
 
   // Check if starting from a "run" deep link - don't show main window in that case
-  const deepLinkArg = process.argv.find((arg) =>
-    arg.startsWith("hydralauncher://")
-  );
+  const deepLinkArg = process.argv.find(isAppDeepLink);
   const forceBigPicture = process.argv.includes("--big-picture");
-  const isRunDeepLink = deepLinkArg?.startsWith("hydralauncher://run");
+  const isRunDeepLink = isGameRunDeepLink(deepLinkArg);
 
   if (!process.argv.includes("--hidden") && !isRunDeepLink) {
     WindowManager.createMainWindow({ forceBigPicture });
@@ -297,6 +307,7 @@ const handleDeepLinkPath = (uri?: string) => {
 
   try {
     const url = new URL(uri);
+    if (!isAppDeepLink(uri)) return;
 
     if (url.host === "run") {
       const shop = url.searchParams.get("shop") as GameShop | null;
@@ -360,13 +371,11 @@ const handleDeepLinkPath = (uri?: string) => {
 };
 
 app.on("second-instance", (_event, commandLine) => {
-  const deepLink = commandLine.find((arg) =>
-    arg.startsWith("hydralauncher://")
-  );
+  const deepLink = commandLine.find(isAppDeepLink);
   const forceBigPicture = commandLine.includes("--big-picture");
 
   // Check if this is a "run" deep link - don't show main window in that case
-  const isRunDeepLink = deepLink?.startsWith("hydralauncher://run");
+  const isRunDeepLink = isGameRunDeepLink(deepLink);
 
   if (!isRunDeepLink) {
     if (WindowManager.mainWindow) {

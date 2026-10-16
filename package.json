@@ -1,12 +1,23 @@
 {
-  "name": "hydralauncher",
+  "name": "orbit-launcher",
   "version": "4.1.6",
-  "description": "Hydra",
+  "description": "Orbit — your games, achievements and playtime in one place",
   "main": "./out/main/index.js",
-  "author": "Los Broxas",
+  "author": "RealThreat",
+  "license": "MIT",
+  "homepage": "https://github.com/RealThreat/orbit",
+  "bugs": {
+    "url": "https://github.com/RealThreat/orbit/issues"
+  },
+  "contributors": [
+    {
+      "name": "Los Broxas",
+      "url": "https://github.com/hydralauncher/hydra"
+    }
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/hydralauncher/hydra.git"
+    "url": "https://github.com/RealThreat/orbit.git"
   },
   "type": "module",
   "engines": {
@@ -14,6 +25,7 @@
     "yarn": ">= 1.19.1"
   },
   "scripts": {
+    "brand:assets": "node scripts/generate-orbit-branding.mjs",
     "format": "prettier --write .",
     "format-check": "prettier --check .",
     "test": "node --import ./scripts/register-ts-node.mjs --test \"src/**/*.test.ts\" \"src/**/*.test.cjs\" \"scripts/*.test.mjs\"",
