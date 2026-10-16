@@ -510,6 +510,9 @@ export function Sidebar() {
       )}
 
       <div className="sidebar__container">
+        <button className="sidebar__orbit-brand" onClick={() => navigate("/")}>
+          <span aria-hidden="true">◒</span> Orbit
+        </button>
         <SidebarProfile />
 
         <div className="sidebar__content">
