@@ -17,6 +17,8 @@ import type {
   ConsoleTitle,
 } from "@types";
 import "./console-achievements.scss";
+import { GamePlatformProgress } from "@renderer/components/game-platform-progress/game-platform-progress";
+import { consoleProgressId } from "@renderer/components/game-platform-progress/progress-model";
 
 const initialAccounts: ConsoleAccount[] = ["psn", "xbox"].map((provider) => ({
   provider: provider as ConsoleProvider,
@@ -363,6 +365,15 @@ export default function ConsoleAchievements() {
             <h2>{selected.title.title}</h2>
             <span>{selected.title.platforms.join(" · ")}</span>
           </div>
+          <GamePlatformProgress
+            anchorId={consoleProgressId(
+              selected.title.provider,
+              selected.accountId,
+              selected.title.id
+            )}
+            title={selected.title.title}
+            accounts={accounts}
+          />
           {detailsLoading ? (
             <p role="status">{t("loading")}</p>
           ) : error ? (

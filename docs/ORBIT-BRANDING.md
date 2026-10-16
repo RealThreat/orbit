@@ -18,7 +18,9 @@ remain in `LICENSE`; upstream dependencies retain their own licenses.
 
 ## Assets
 
-The lime Orbit badge derives from the supplied interface reference. Source files:
+The current Orbit badge is a geometric open O with a detached violet corner,
+on a dark background. The first planet/ring version is retained under
+`resources/orbit/archive-v1/`. Source files:
 `resources/orbit/logo.svg` (badge) and
 `src/renderer/src/assets/icons/orbit.svg` (monochrome symbol).
 
